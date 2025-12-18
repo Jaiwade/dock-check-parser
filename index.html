@@ -23,22 +23,19 @@
     <script type="text/babel">
         const { useState, useEffect, useRef } = React;
 
-        const Download = () => (<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>);
-        const FileSpreadsheet = () => (<svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>);
-        const Mic = () => (<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path><line x1="12" y1="19" x2="12" y2="23"></line><line x1="8" y1="23" x2="16" y2="23"></line></svg>);
-
         const CARRIER_MAP = {
             'estes': 'EXLA', 'estates': 'EXLA', 'abf': 'ABFS',
             'aaa cooper': 'AACT', 'cooper': 'AACT', 'old dominion': 'ODFL',
             'od': 'ODFL', 'global': 'GLBL', 'southeastern': 'SEFL',
             'sefl': 'SEFL', 'fedex': 'FXFE', 'fed ex': 'FXFE',
-            'amazon': 'AMAZON', 'azng': 'AZNG', 'ms': 'MSOH', 'fedex': 'FXFE', 'Fedex' :'FXFE'
+            'amazon': 'AMAZON', 'azng': 'AZNG', 'ms': 'MSOH'
         };
 
         const DocCheckParser = () => {
             const [input, setInput] = useState('');
             const [status, setStatus] = useState('Full');
             const [allEntries, setAllEntries] = useState([]);
+            const [error, setError] = useState('');
             const [isListening, setIsListening] = useState(false);
             const [transcript, setTranscript] = useState('');
             const recognitionRef = useRef(null);
@@ -63,53 +60,59 @@
             }, [isListening]);
 
             const parseMessage = (text, currentStatus) => {
-                const lines = text.trim().split('\n');
+                const lines = text.split('\n').filter(l => l.trim() !== '');
+                
                 return lines.map(line => {
-                    const doc = nlp(line.toLowerCase());
+                    const cleanLine = line.toLowerCase().trim();
                     
-                    // Improved Door Detection ("Dock Door", "Door", "DD")
+                    // 1. DOOR DETECTION (Strict & Robust)
                     let doorVal = '';
-                    let doorMatch = doc.match('(dock door|door|dd) #').terms(-1).text();
+                    // Match "DD052", "DD 52", "Door 52", "Dock Door 52"
+                    const doorRegex = /(?:door|dd|dock door)\s*#?(\d{1,3})/i;
+                    const doorMatch = cleanLine.match(doorRegex);
                     
-                    if (!doorMatch) {
-                        let firstNum = doc.numbers().first().get(0);
-                        if (firstNum && firstNum < 200) doorMatch = firstNum;
-                    }
                     if (doorMatch) {
-                        const cleanNum = String(doorMatch).replace(/\D/g, '');
-                        doorVal = `DD${cleanNum.padStart(3, '0')}`;
-                    }
-
-                    // Trailer Detection
-                    let trailerVal = '';
-                    let possibleTrailers = doc.numbers().filter(n => n.get(0) > 1000).text();
-                    if (!possibleTrailers) {
-                        let match = line.match(/\b([A-Z]{2,4}\d{4,7}|\d{5,8})\b/i);
-                        trailerVal = match ? match[0].toUpperCase() : '';
+                        const num = doorMatch[1];
+                        doorVal = `DD${num.padStart(3, '0')}`;
                     } else {
-                        trailerVal = possibleTrailers.split(' ')[0];
+                        // Fallback: If no keywords, look for a standalone 1-3 digit number
+                        const standAloneNum = cleanLine.match(/\b(\d{1,3})\b/);
+                        if (standAloneNum && parseInt(standAloneNum[1]) < 200) {
+                            doorVal = `DD${standAloneNum[1].padStart(3, '0')}`;
+                        }
                     }
 
-                    // Carrier Logic
+                    // 2. TRAILER DETECTION (Min 4 digits, ignore the door number)
+                    let trailerVal = '';
+                    const trailerRegex = /\b([A-Z]{0,4}\d{4,8})\b/i;
+                    const tMatch = cleanLine.match(trailerRegex);
+                    if (tMatch) {
+                        trailerVal = tMatch[0].toUpperCase();
+                    }
+
+                    // 3. CARRIER MAPPING
                     let scac = '';
                     for (const [nickname, code] of Object.entries(CARRIER_MAP)) {
-                        if (doc.has(nickname)) { scac = code; break; }
+                        if (cleanLine.includes(nickname)) {
+                            scac = code;
+                            break;
+                        }
                     }
 
-                    // Load Type
+                    // 4. LOAD TYPE
                     let type = '';
                     if (doorVal) {
                         const num = parseInt(doorVal.replace(/\D/g,''));
-                        type = (num >= 50 && num <= 72) ? 'LTL' : (num >= 80 && num <= 106) ? 'TL' : '';
+                        type = (num >= 50 && num <= 72) ? 'LTL' : (num >= 80 && num <= 106) ? 'TL' : 'Other';
                     }
 
-                    return {
-                        door: doorVal,
-                        trailer: trailerVal,
-                        carrier: scac,
-                        loadType: type,
-                        status: currentStatus,
-                        timestamp: new Date().toLocaleString()
+                    return { 
+                        door: doorVal, 
+                        trailer: trailerVal, 
+                        carrier: scac, 
+                        loadType: type, 
+                        status: currentStatus, 
+                        timestamp: new Date().toLocaleString() 
                     };
                 }).filter(e => e.door || e.trailer);
             };
@@ -117,89 +120,63 @@
             const handleParse = () => {
                 if (!input.trim()) return;
                 const newParsed = parseMessage(input, status);
-                setAllEntries(prev => [...prev, ...newParsed]);
+                if (newParsed.length === 0) {
+                    setError("Couldn't find a Door. Try 'DD052' or 'Door 52'");
+                    return;
+                }
+                setAllEntries(prev => [...newParsed, ...prev]);
                 setInput('');
-            };
-
-            const exportReport = () => {
-                const data = allEntries.map(e => ({
-                    'Date/Time': e.timestamp, 'Door': e.door, 'Carrier': e.carrier,
-                    'Trailer': e.trailer, 'Load Type': e.loadType, 'Status': e.status
-                }));
-                const ws = XLSX.utils.json_to_sheet(data);
-                const wb = XLSX.utils.book_new();
-                XLSX.utils.book_append_sheet(wb, ws, "Dock Checks");
-                XLSX.writeFile(wb, `DockCheck_${new Date().toLocaleDateString()}.xlsx`);
+                setError('');
             };
 
             return (
-                <div className="min-h-screen bg-gray-50 p-6">
-                    <div className="max-w-5xl mx-auto bg-white rounded-xl shadow-lg p-8">
-                        <div className="flex justify-between items-center mb-8 border-b pb-4">
-                            <div className="flex items-center gap-3">
-                                <FileSpreadsheet />
-                                <h1 className="text-2xl font-bold text-gray-800">Dock Check Pro</h1>
-                            </div>
-                            <button onClick={exportReport} className="bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded-lg font-bold flex items-center gap-2">
-                                <Download /> Export ({allEntries.length})
+                <div className="min-h-screen bg-gray-50 p-4">
+                    <div className="max-w-3xl mx-auto bg-white rounded-xl shadow-lg p-6">
+                        <h1 className="text-xl font-bold mb-4 border-b pb-2">Dock Check Pro</h1>
+                        
+                        {error && <div className="bg-red-100 text-red-700 p-2 mb-4 rounded text-sm">{error}</div>}
+
+                        <div className="grid grid-cols-2 gap-4 mb-4">
+                            <select value={status} onChange={(e) => setStatus(e.target.value)} className="p-3 border rounded-lg bg-white">
+                                <option value="Full">Full (Loaded)</option>
+                                <option value="Empty">Empty (Available)</option>
+                            </select>
+                            <button onClick={() => { if (isListening) recognitionRef.current?.stop(); else recognitionRef.current?.start(); setIsListening(!isListening); }} 
+                                    className={`p-3 rounded-lg font-bold ${isListening ? 'bg-red-500 text-white animate-pulse' : 'bg-indigo-600 text-white'}`}>
+                                {isListening ? "⏹ Stop" : "🎤 Voice"}
                             </button>
                         </div>
 
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-                            <div>
-                                <label className="block text-sm font-bold text-gray-700 mb-2">Trailer Status</label>
-                                <select value={status} onChange={(e) => setStatus(e.target.value)} className="w-full p-3 border-2 border-indigo-200 rounded-lg">
-                                    <option value="Full">Full (Loaded)</option>
-                                    <option value="Empty">Empty (Available)</option>
-                                </select>
-                            </div>
-                            <div>
-                                <label className="block text-sm font-bold text-gray-700 mb-2">Voice Input</label>
-                                <button onClick={() => { if (isListening) recognitionRef.current?.stop(); else recognitionRef.current?.start(); setIsListening(!isListening); }} 
-                                        className={`w-full py-3 rounded-lg font-bold transition-all ${isListening ? 'bg-red-500 text-white animate-pulse' : 'bg-indigo-600 text-white'}`}>
-                                    {isListening ? "Stop Recording" : "Start Voice Input"}
-                                </button>
-                            </div>
-                        </div>
+                        <textarea value={input} onChange={(e) => setInput(e.target.value)} className="w-full h-20 p-3 border rounded-lg mb-4" placeholder="Type 'DD052' or speak..." />
 
-                        <div className="mb-6">
-                            {isListening && transcript && <div className="text-indigo-600 italic text-sm mb-1">Hearing: {transcript}</div>}
-                            <textarea value={input} onChange={(e) => setInput(e.target.value)} className="w-full h-32 p-4 border-2 border-gray-200 rounded-lg" placeholder="Example: Dock door 5 has trailer 5055 with Estes..." />
-                        </div>
+                        <button onClick={handleParse} className="w-full bg-indigo-700 text-white py-3 rounded-lg font-bold mb-6">Add to Log</button>
 
-                        <div className="flex gap-4 mb-8">
-                            <button onClick={handleParse} className="bg-indigo-700 text-white px-8 py-3 rounded-lg font-bold">Add to Log</button>
-                            <button onClick={() => setAllEntries([])} className="text-gray-400 hover:text-red-500 font-semibold">Reset History</button>
-                        </div>
-
-                        {allEntries.length > 0 && (
-                            <div className="overflow-hidden border rounded-lg">
-                                <table className="w-full text-left">
-                                    <thead className="bg-gray-100">
-                                        <tr>
-                                            <th className="p-3 text-xs font-bold uppercase">Door</th>
-                                            <th className="p-3 text-xs font-bold uppercase">Trailer</th>
-                                            <th className="p-3 text-xs font-bold uppercase">Carrier</th>
-                                            <th className="p-3 text-xs font-bold uppercase">Status</th>
+                        <div className="overflow-hidden border rounded-lg">
+                            <table className="w-full text-left">
+                                <thead className="bg-gray-100 text-[10px] uppercase font-bold text-gray-500">
+                                    <tr>
+                                        <th className="p-3">Door</th>
+                                        <th className="p-3">Trailer</th>
+                                        <th className="p-3">Carrier</th>
+                                        <th className="p-3">Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody className="divide-y">
+                                    {allEntries.map((e, i) => (
+                                        <tr key={i} className="text-sm">
+                                            <td className="p-3 font-mono font-bold text-indigo-700">{e.door || '??'}</td>
+                                            <td className="p-3 font-semibold">{e.trailer || '-'}</td>
+                                            <td className="p-3 font-bold">{e.carrier || '-'}</td>
+                                            <td className="p-3">
+                                                <span className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase ${e.status === 'Full' ? 'bg-orange-100 text-orange-700' : 'bg-green-100 text-green-700'}`}>
+                                                    {e.status}
+                                                </span>
+                                            </td>
                                         </tr>
-                                    </thead>
-                                    <tbody className="divide-y">
-                                        {allEntries.slice().reverse().map((e, i) => (
-                                            <tr key={i} className="hover:bg-gray-50">
-                                                <td className="p-3 font-mono font-bold text-indigo-600">{e.door || '??'}</td>
-                                                <td className="p-3 font-semibold">{e.trailer || '??'}</td>
-                                                <td className="p-3 font-bold">{e.carrier || '-'}</td>
-                                                <td className="p-3">
-                                                    <span className={`px-2 py-1 rounded text-xs font-bold ${e.status === 'Full' ? 'bg-orange-100 text-orange-700' : 'bg-green-100 text-green-700'}`}>
-                                                        {e.status}
-                                                    </span>
-                                                </td>
-                                            </tr>
-                                        ))}
-                                    </tbody>
-                                </table>
-                            </div>
-                        )}
+                                    ))}
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
                 </div>
             );
@@ -209,5 +186,5 @@
     </script>
 </body>
 </html>
-</html>
+
 
