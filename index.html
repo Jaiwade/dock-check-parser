@@ -15,13 +15,14 @@
     <script crossorigin src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.5/babel.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-    <script src="https://unpkg.com/compromise"></script>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <div id="root"></div>
     <script type="text/babel">
         const { useState, useEffect, useRef } = React;
+
+        const Download = () => (<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>);
 
         const CARRIER_MAP = {
             'estes': 'EXLA', 'estates': 'EXLA', 'abf': 'ABFS',
@@ -61,67 +62,49 @@
 
             const parseMessage = (text, currentStatus) => {
                 const lines = text.split('\n').filter(l => l.trim() !== '');
-                
                 return lines.map(line => {
                     const cleanLine = line.toLowerCase().trim();
                     
-                    // 1. DOOR DETECTION (Strict & Robust)
+                    // 1. Log Logic: Door Extraction
                     let doorVal = '';
-                    // Match "DD052", "DD 52", "Door 52", "Dock Door 52"
                     const doorRegex = /(?:door|dd|dock door)\s*#?(\d{1,3})/i;
                     const doorMatch = cleanLine.match(doorRegex);
-                    
                     if (doorMatch) {
-                        const num = doorMatch[1];
-                        doorVal = `DD${num.padStart(3, '0')}`;
+                        doorVal = `DD${doorMatch[1].padStart(3, '0')}`;
                     } else {
-                        // Fallback: If no keywords, look for a standalone 1-3 digit number
                         const standAloneNum = cleanLine.match(/\b(\d{1,3})\b/);
                         if (standAloneNum && parseInt(standAloneNum[1]) < 200) {
                             doorVal = `DD${standAloneNum[1].padStart(3, '0')}`;
                         }
                     }
 
-                    // 2. TRAILER DETECTION (Min 4 digits, ignore the door number)
+                    // 2. Log Logic: Trailer Extraction (4-8 digits)
                     let trailerVal = '';
                     const trailerRegex = /\b([A-Z]{0,4}\d{4,8})\b/i;
                     const tMatch = cleanLine.match(trailerRegex);
-                    if (tMatch) {
-                        trailerVal = tMatch[0].toUpperCase();
-                    }
+                    if (tMatch) trailerVal = tMatch[0].toUpperCase();
 
-                    // 3. CARRIER MAPPING
+                    // 3. Log Logic: Carrier Mapping
                     let scac = '';
                     for (const [nickname, code] of Object.entries(CARRIER_MAP)) {
-                        if (cleanLine.includes(nickname)) {
-                            scac = code;
-                            break;
-                        }
-                    }
-
-                    // 4. LOAD TYPE
-                    let type = '';
-                    if (doorVal) {
-                        const num = parseInt(doorVal.replace(/\D/g,''));
-                        type = (num >= 50 && num <= 72) ? 'LTL' : (num >= 80 && num <= 106) ? 'TL' : 'Other';
+                        if (cleanLine.includes(nickname)) { scac = code; break; }
                     }
 
                     return { 
                         door: doorVal, 
                         trailer: trailerVal, 
                         carrier: scac, 
-                        loadType: type, 
                         status: currentStatus, 
-                        timestamp: new Date().toLocaleString() 
+                        timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) 
                     };
                 }).filter(e => e.door || e.trailer);
             };
 
-            const handleParse = () => {
+            const handleLog = () => {
                 if (!input.trim()) return;
                 const newParsed = parseMessage(input, status);
                 if (newParsed.length === 0) {
-                    setError("Couldn't find a Door. Try 'DD052' or 'Door 52'");
+                    setError("Could not log. Try 'Door 52 trailer 12345'");
                     return;
                 }
                 setAllEntries(prev => [...newParsed, ...prev]);
@@ -129,54 +112,98 @@
                 setError('');
             };
 
-            return (
-                <div className="min-h-screen bg-gray-50 p-4">
-                    <div className="max-w-3xl mx-auto bg-white rounded-xl shadow-lg p-6">
-                        <h1 className="text-xl font-bold mb-4 border-b pb-2">Dock Check Pro</h1>
-                        
-                        {error && <div className="bg-red-100 text-red-700 p-2 mb-4 rounded text-sm">{error}</div>}
+            const exportReport = () => {
+                const data = allEntries.map(e => ({
+                    'Time': e.timestamp, 'Door': e.door, 'Carrier': e.carrier,
+                    'Trailer': e.trailer, 'Status': e.status
+                }));
+                const ws = XLSX.utils.json_to_sheet(data);
+                const wb = XLSX.utils.book_new();
+                XLSX.utils.book_append_sheet(wb, ws, "Dock Checks");
+                XLSX.writeFile(wb, `DockCheck_${new Date().toLocaleDateString()}.xlsx`);
+            };
 
-                        <div className="grid grid-cols-2 gap-4 mb-4">
-                            <select value={status} onChange={(e) => setStatus(e.target.value)} className="p-3 border rounded-lg bg-white">
-                                <option value="Full">Full (Loaded)</option>
-                                <option value="Empty">Empty (Available)</option>
-                            </select>
-                            <button onClick={() => { if (isListening) recognitionRef.current?.stop(); else recognitionRef.current?.start(); setIsListening(!isListening); }} 
-                                    className={`p-3 rounded-lg font-bold ${isListening ? 'bg-red-500 text-white animate-pulse' : 'bg-indigo-600 text-white'}`}>
-                                {isListening ? "⏹ Stop" : "🎤 Voice"}
+            return (
+                <div className="min-h-screen bg-gray-100 p-4 font-sans">
+                    <div className="max-w-xl mx-auto bg-white rounded-2xl shadow-2xl p-6 border border-gray-200">
+                        
+                        {/* Header */}
+                        <div className="flex justify-between items-center mb-6 border-b pb-4">
+                            <div>
+                                <h1 className="text-xl font-black text-indigo-900 uppercase">Dock Check Pro</h1>
+                                <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest">Parser Active</p>
+                            </div>
+                            <button onClick={exportReport} className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-xl text-xs font-black flex items-center gap-2 transition-all active:scale-95 shadow-lg">
+                                <Download /> EXCEL
                             </button>
                         </div>
 
-                        <textarea value={input} onChange={(e) => setInput(e.target.value)} className="w-full h-20 p-3 border rounded-lg mb-4" placeholder="Type 'DD052' or speak..." />
+                        {/* Controls */}
+                        <div className="grid grid-cols-2 gap-4 mb-4">
+                            <div className="bg-gray-50 p-3 rounded-xl border border-gray-100">
+                                <label className="block text-[10px] font-black text-gray-400 uppercase mb-1">Set Status</label>
+                                <select value={status} onChange={(e) => setStatus(e.target.value)} className="w-full bg-transparent text-sm font-black text-indigo-900 outline-none cursor-pointer">
+                                    <option value="Full">FULL (LOADED)</option>
+                                    <option value="Empty">EMPTY (AVAIL)</option>
+                                </select>
+                            </div>
+                            <button onClick={() => { if (isListening) recognitionRef.current?.stop(); else recognitionRef.current?.start(); setIsListening(!isListening); }} 
+                                    className={`rounded-xl text-xs font-black transition-all shadow-lg active:scale-95 ${isListening ? 'bg-red-500 text-white animate-pulse' : 'bg-indigo-600 text-white hover:bg-indigo-700'}`}>
+                                {isListening ? "⏹ STOP RECORDING" : "🎤 VOICE INPUT"}
+                            </button>
+                        </div>
 
-                        <button onClick={handleParse} className="w-full bg-indigo-700 text-white py-3 rounded-lg font-bold mb-6">Add to Log</button>
+                        {/* Input Area */}
+                        <div className="relative mb-4">
+                            {error && <div className="absolute -top-4 right-0 text-red-500 text-[10px] font-black uppercase">{error}</div>}
+                            {isListening && transcript && <div className="absolute -top-4 left-0 text-indigo-600 italic text-[10px] font-bold">Hearing: {transcript}</div>}
+                            <textarea value={input} onChange={(e) => setInput(e.target.value)} className="w-full h-24 p-4 border-2 border-gray-100 rounded-2xl bg-gray-50 text-sm font-medium focus:border-indigo-500 focus:bg-white outline-none transition-all shadow-inner" placeholder="Example: DD052 trailer 12345 Estes" />
+                        </div>
 
-                        <div className="overflow-hidden border rounded-lg">
+                        {/* Log Button */}
+                        <button onClick={handleLog} className="w-full bg-indigo-900 hover:bg-black text-white py-4 rounded-2xl font-black text-sm tracking-[0.2em] transition-all active:scale-95 shadow-xl mb-6">
+                            ADD TO LOG
+                        </button>
+
+                        {/* Recent Entry Preview */}
+                        {allEntries.length > 0 && (
+                            <div className="mb-4 p-3 bg-indigo-50 rounded-xl border border-indigo-100 flex justify-between items-center">
+                                <span className="text-[10px] font-black text-indigo-400 uppercase">Last Entry:</span>
+                                <span className="text-xs font-black text-indigo-900">{allEntries[0].door} | {allEntries[0].trailer} | {allEntries[0].carrier}</span>
+                            </div>
+                        )}
+
+                        {/* Log Table */}
+                        <div className="bg-white border border-gray-100 rounded-2xl overflow-hidden shadow-sm">
                             <table className="w-full text-left">
-                                <thead className="bg-gray-100 text-[10px] uppercase font-bold text-gray-500">
+                                <thead className="bg-gray-50 text-[10px] text-gray-400 font-black uppercase tracking-tighter">
                                     <tr>
-                                        <th className="p-3">Door</th>
-                                        <th className="p-3">Trailer</th>
-                                        <th className="p-3">Carrier</th>
-                                        <th className="p-3">Status</th>
+                                        <th className="p-4">Door</th>
+                                        <th className="p-4">Trailer</th>
+                                        <th className="p-4">Carrier</th>
+                                        <th className="p-4 text-right">Status</th>
                                     </tr>
                                 </thead>
-                                <tbody className="divide-y">
+                                <tbody className="divide-y divide-gray-50">
                                     {allEntries.map((e, i) => (
-                                        <tr key={i} className="text-sm">
-                                            <td className="p-3 font-mono font-bold text-indigo-700">{e.door || '??'}</td>
-                                            <td className="p-3 font-semibold">{e.trailer || '-'}</td>
-                                            <td className="p-3 font-bold">{e.carrier || '-'}</td>
-                                            <td className="p-3">
-                                                <span className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase ${e.status === 'Full' ? 'bg-orange-100 text-orange-700' : 'bg-green-100 text-green-700'}`}>
-                                                    {e.status}
-                                                </span>
+                                        <tr key={i} className="text-xs hover:bg-gray-50 transition-colors">
+                                            <td className="p-4 font-mono font-black text-indigo-600">{e.door}</td>
+                                            <td className="p-4 font-bold text-gray-800">{e.trailer}</td>
+                                            <td className="p-4 font-black text-gray-400">{e.carrier}</td>
+                                            <td className="p-4 text-right font-black uppercase">
+                                                <span className={e.status === 'Full' ? 'text-orange-500' : 'text-green-500'}>{e.status}</span>
                                             </td>
                                         </tr>
                                     ))}
                                 </tbody>
                             </table>
                         </div>
+                        
+                        {allEntries.length > 0 && (
+                            <button onClick={() => setAllEntries([])} className="w-full mt-4 text-[10px] font-black text-gray-300 hover:text-red-400 uppercase tracking-widest transition-colors">
+                                Clear Log History
+                            </button>
+                        )}
                     </div>
                 </div>
             );
@@ -186,5 +213,6 @@
     </script>
 </body>
 </html>
+
 
 
