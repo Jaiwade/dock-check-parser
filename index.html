@@ -1,92 +1,63 @@
-<!-- Google tag (gtag.js) -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-RDVPFB5PML"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
-
-  gtag('config', 'G-RDVPFB5PML');
-</script>
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Doc Check Parser Pro</title>
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"></script>
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-RDVPFB5PML"></script>
     <script>
       window.dataLayer = window.dataLayer || [];
       function gtag(){dataLayer.push(arguments);}
       gtag('js', new Date());
-      gtag('config', 'G-XXXXXXXXXX'); // REPLACE WITH YOUR ID
+      gtag('config', 'G-RDVPFB5PML');
     </script>
-    
     <script crossorigin src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
     <script crossorigin src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.5/babel.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script src="https://unpkg.com/compromise"></script>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <div id="root"></div>
-    
     <script type="text/babel">
         const { useState, useEffect, useRef } = React;
 
-        // --- Icons ---
-        const AlertCircle = () => (<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>);
         const Download = () => (<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>);
-        const FileSpreadsheet = () => (<svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>);
+        const FileSpreadsheet = () => (<svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>);
         const Mic = () => (<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path><line x1="12" y1="19" x2="12" y2="23"></line><line x1="8" y1="23" x2="16" y2="23"></line></svg>);
-        const MicOff = () => (<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><line x1="1" y1="1" x2="23" y2="23"></line><path d="M9 9v3a3 3 0 0 0 5.12 2.12M15 9.34V4a3 3 0 0 0-5.94-.6"></path><path d="M17 16.95A7 7 0 0 1 5 12v-2m14 0v2a7 7 0 0 1-.11 1.23"></path><line x1="12" y1="19" x2="12" y2="23"></line><line x1="8" y1="23" x2="16" y2="23"></line></svg>);
-        const Volume2 = () => (<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path></svg>);
+
+        const CARRIER_MAP = {
+            'estes': 'EXLA', 'estates': 'EXLA', 'abf': 'ABFS',
+            'aaa cooper': 'AACT', 'cooper': 'AACT', 'old dominion': 'ODFL',
+            'od': 'ODFL', 'global': 'GLBL', 'southeastern': 'SEFL',
+            'sefl': 'SEFL', 'fedex': 'FXFE', 'fed ex': 'FXFE',
+            'amazon': 'AMAZON', 'azng': 'AZNG', 'ms': 'MSOH', 'fedex': 'FXFE', 'Fedex' :'FXFE'
+        };
 
         const DocCheckParser = () => {
             const [input, setInput] = useState('');
-            const [status, setStatus] = useState('Full'); // Default status
-            const [entries, setEntries] = useState([]);
+            const [status, setStatus] = useState('Full');
             const [allEntries, setAllEntries] = useState([]);
-            const [error, setError] = useState('');
             const [isListening, setIsListening] = useState(false);
             const [transcript, setTranscript] = useState('');
-            const [browserSupport, setBrowserSupport] = useState(true);
-            const [loadType, setLoadType] = useState('ALL');
             const recognitionRef = useRef(null);
 
-            const ALL_SCAC_CODES = ['EXLA', 'ABFS', 'AACT', 'ODFL', 'GLBL', 'SEFL', 'FXFE', 'AMAZON', 'MS', 'AZNG'];
-
             useEffect(() => {
-                if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
-                    setBrowserSupport(false);
-                    return;
-                }
+                if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) return;
                 const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
                 const recognition = new SpeechRecognition();
                 recognition.continuous = true;
                 recognition.interimResults = true;
-                recognition.lang = 'en-US';
-
                 recognition.onresult = (event) => {
-                    let interim = '';
-                    let final = '';
+                    let interim = '', final = '';
                     for (let i = event.resultIndex; i < event.results.length; i++) {
-                        const text = event.results[i][0].transcript;
-                        if (event.results[i].isFinal) {
-                            final += text + ' ';
-                        } else {
-                            interim += text;
-                        }
+                        if (event.results[i].isFinal) final += event.results[i][0].transcript + ' ';
+                        else interim += event.results[i][0].transcript;
                     }
-                    if (final) {
-                        // FIX: Append to input, don't overwrite
-                        setInput(prev => prev + final.trim() + '\n');
-                        setTranscript('');
-                    } else {
-                        setTranscript(interim);
-                    }
+                    if (final) { setInput(prev => prev + final.trim() + '\n'); setTranscript(''); }
+                    else { setTranscript(interim); }
                 };
-
                 recognition.onend = () => { if (isListening) recognition.start(); };
                 recognitionRef.current = recognition;
             }, [isListening]);
@@ -94,79 +65,71 @@
             const parseMessage = (text, currentStatus) => {
                 const lines = text.trim().split('\n');
                 return lines.map(line => {
-                    const upper = line.toUpperCase();
-                    let door = upper.match(/DD\d{2,3}/) || upper.match(/DOOR\s*(\d{2,3})/);
-                    let trailer = upper.match(/\b([A-Z]{2,4}\d{4,7}|\d{4,8})\b/);
-                    let scac = ALL_SCAC_CODES.find(code => upper.includes(code));
+                    const doc = nlp(line.toLowerCase());
                     
-                    const doorVal = door ? (door[1] ? `DD${door[1].padStart(3,'0')}` : door[0]) : '';
+                    // Improved Door Detection ("Dock Door", "Door", "DD")
+                    let doorVal = '';
+                    let doorMatch = doc.match('(dock door|door|dd) #').terms(-1).text();
                     
-                    // Logic for Load Type based on door range
+                    if (!doorMatch) {
+                        let firstNum = doc.numbers().first().get(0);
+                        if (firstNum && firstNum < 200) doorMatch = firstNum;
+                    }
+                    if (doorMatch) {
+                        const cleanNum = String(doorMatch).replace(/\D/g, '');
+                        doorVal = `DD${cleanNum.padStart(3, '0')}`;
+                    }
+
+                    // Trailer Detection
+                    let trailerVal = '';
+                    let possibleTrailers = doc.numbers().filter(n => n.get(0) > 1000).text();
+                    if (!possibleTrailers) {
+                        let match = line.match(/\b([A-Z]{2,4}\d{4,7}|\d{5,8})\b/i);
+                        trailerVal = match ? match[0].toUpperCase() : '';
+                    } else {
+                        trailerVal = possibleTrailers.split(' ')[0];
+                    }
+
+                    // Carrier Logic
+                    let scac = '';
+                    for (const [nickname, code] of Object.entries(CARRIER_MAP)) {
+                        if (doc.has(nickname)) { scac = code; break; }
+                    }
+
+                    // Load Type
                     let type = '';
                     if (doorVal) {
                         const num = parseInt(doorVal.replace(/\D/g,''));
-                        type = (num >= 52 && num <= 72) ? 'LTL' : (num >= 86 && num <= 109) ? 'TL' : '';
+                        type = (num >= 50 && num <= 72) ? 'LTL' : (num >= 80 && num <= 106) ? 'TL' : '';
                     }
 
                     return {
                         door: doorVal,
-                        trailer: trailer ? trailer[0] : '',
-                        carrier: scac || '',
+                        trailer: trailerVal,
+                        carrier: scac,
                         loadType: type,
-                        status: currentStatus, // New Required Column
-                        originalText: line,
+                        status: currentStatus,
                         timestamp: new Date().toLocaleString()
                     };
                 }).filter(e => e.door || e.trailer);
             };
 
             const handleParse = () => {
-                if (!input.trim()) return setError('Please enter data first');
+                if (!input.trim()) return;
                 const newParsed = parseMessage(input, status);
-                
-                // LOGGING TO GOOGLE ANALYTICS
-                newParsed.forEach(entry => {
-                    gtag('event', 'entry_added', {
-                        'door': entry.door,
-                        'trailer': entry.trailer,
-                        'status': entry.status
-                    });
-                });
-
                 setAllEntries(prev => [...prev, ...newParsed]);
-                setEntries(newParsed);
                 setInput('');
-                setError('');
             };
 
             const exportReport = () => {
-                if (allEntries.length === 0) return setError('No data to export');
-                
                 const data = allEntries.map(e => ({
-                    'Date/Time': e.timestamp,
-                    'Door': e.door,
-                    'Carrier': e.carrier,
-                    'Trailer': e.trailer,
-                    'Load Type': e.loadType,
-                    'Trailer Status': e.status
+                    'Date/Time': e.timestamp, 'Door': e.door, 'Carrier': e.carrier,
+                    'Trailer': e.trailer, 'Load Type': e.loadType, 'Status': e.status
                 }));
-
                 const ws = XLSX.utils.json_to_sheet(data);
                 const wb = XLSX.utils.book_new();
                 XLSX.utils.book_append_sheet(wb, ws, "Dock Checks");
-                XLSX.writeFile(wb, `DocCheck_Report_${new Date().toLocaleDateString()}.xlsx`);
-                
-                gtag('event', 'report_downloaded', { 'count': allEntries.length });
-            };
-
-            const toggleListening = () => {
-                if (isListening) {
-                    recognitionRef.current?.stop();
-                    setIsListening(false);
-                } else {
-                    recognitionRef.current?.start();
-                    setIsListening(true);
-                }
+                XLSX.writeFile(wb, `DockCheck_${new Date().toLocaleDateString()}.xlsx`);
             };
 
             return (
@@ -178,45 +141,35 @@
                                 <h1 className="text-2xl font-bold text-gray-800">Dock Check Pro</h1>
                             </div>
                             <button onClick={exportReport} className="bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded-lg font-bold flex items-center gap-2">
-                                <Download /> Export Report ({allEntries.length})
+                                <Download /> Export ({allEntries.length})
                             </button>
                         </div>
 
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
                             <div>
-                                <label className="block text-sm font-bold text-gray-700 mb-2">1. Select Trailer Status</label>
-                                <select 
-                                    value={status} 
-                                    onChange={(e) => setStatus(e.target.value)}
-                                    className="w-full p-3 border-2 border-indigo-200 rounded-lg focus:border-indigo-500 bg-white"
-                                >
+                                <label className="block text-sm font-bold text-gray-700 mb-2">Trailer Status</label>
+                                <select value={status} onChange={(e) => setStatus(e.target.value)} className="w-full p-3 border-2 border-indigo-200 rounded-lg">
                                     <option value="Full">Full (Loaded)</option>
                                     <option value="Empty">Empty (Available)</option>
                                 </select>
                             </div>
                             <div>
-                                <label className="block text-sm font-bold text-gray-700 mb-2">2. Voice Input</label>
-                                <button onClick={toggleListening} className={`w-full py-3 rounded-lg font-bold flex items-center justify-center gap-2 transition-all ${isListening ? 'bg-red-500 text-white animate-pulse' : 'bg-indigo-600 text-white'}`}>
-                                    {isListening ? <><MicOff /> Stop Recording</> : <><Mic /> Start Voice Input</>}
+                                <label className="block text-sm font-bold text-gray-700 mb-2">Voice Input</label>
+                                <button onClick={() => { if (isListening) recognitionRef.current?.stop(); else recognitionRef.current?.start(); setIsListening(!isListening); }} 
+                                        className={`w-full py-3 rounded-lg font-bold transition-all ${isListening ? 'bg-red-500 text-white animate-pulse' : 'bg-indigo-600 text-white'}`}>
+                                    {isListening ? "Stop Recording" : "Start Voice Input"}
                                 </button>
                             </div>
                         </div>
 
                         <div className="mb-6">
-                            {isListening && transcript && (
-                                <div className="text-indigo-600 italic text-sm mb-1">Live: {transcript}</div>
-                            )}
-                            <textarea 
-                                value={input} 
-                                onChange={(e) => setInput(e.target.value)}
-                                className="w-full h-32 p-4 border-2 border-gray-200 rounded-lg"
-                                placeholder="Logs will appear here or type manually..."
-                            />
+                            {isListening && transcript && <div className="text-indigo-600 italic text-sm mb-1">Hearing: {transcript}</div>}
+                            <textarea value={input} onChange={(e) => setInput(e.target.value)} className="w-full h-32 p-4 border-2 border-gray-200 rounded-lg" placeholder="Example: Dock door 5 has trailer 5055 with Estes..." />
                         </div>
 
                         <div className="flex gap-4 mb-8">
                             <button onClick={handleParse} className="bg-indigo-700 text-white px-8 py-3 rounded-lg font-bold">Add to Log</button>
-                            <button onClick={() => setAllEntries([])} className="text-gray-500 hover:text-red-500 font-semibold">Reset History</button>
+                            <button onClick={() => setAllEntries([])} className="text-gray-400 hover:text-red-500 font-semibold">Reset History</button>
                         </div>
 
                         {allEntries.length > 0 && (
@@ -226,21 +179,21 @@
                                         <tr>
                                             <th className="p-3 text-xs font-bold uppercase">Door</th>
                                             <th className="p-3 text-xs font-bold uppercase">Trailer</th>
+                                            <th className="p-3 text-xs font-bold uppercase">Carrier</th>
                                             <th className="p-3 text-xs font-bold uppercase">Status</th>
-                                            <th className="p-3 text-xs font-bold uppercase">Type</th>
                                         </tr>
                                     </thead>
                                     <tbody className="divide-y">
                                         {allEntries.slice().reverse().map((e, i) => (
                                             <tr key={i} className="hover:bg-gray-50">
-                                                <td className="p-3 font-mono">{e.door || '??'}</td>
-                                                <td className="p-3">{e.trailer || '??'}</td>
+                                                <td className="p-3 font-mono font-bold text-indigo-600">{e.door || '??'}</td>
+                                                <td className="p-3 font-semibold">{e.trailer || '??'}</td>
+                                                <td className="p-3 font-bold">{e.carrier || '-'}</td>
                                                 <td className="p-3">
                                                     <span className={`px-2 py-1 rounded text-xs font-bold ${e.status === 'Full' ? 'bg-orange-100 text-orange-700' : 'bg-green-100 text-green-700'}`}>
                                                         {e.status}
                                                     </span>
                                                 </td>
-                                                <td className="p-3 text-xs text-gray-500">{e.loadType}</td>
                                             </tr>
                                         ))}
                                     </tbody>
@@ -256,6 +209,5 @@
     </script>
 </body>
 </html>
-</body>
-
 </html>
+
