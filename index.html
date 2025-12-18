@@ -1,9 +1,27 @@
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-RDVPFB5PML"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-RDVPFB5PML');
+</script>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Doc Check </title>
+    <title>Doc Check Parser Pro</title>
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-XXXXXXXXXX'); // REPLACE WITH YOUR ID
+    </script>
+    
     <script crossorigin src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
     <script crossorigin src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.5/babel.min.js"></script>
@@ -16,67 +34,17 @@
     <script type="text/babel">
         const { useState, useEffect, useRef } = React;
 
-        const AlertCircle = () => (
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <circle cx="12" cy="12" r="10"></circle>
-                <line x1="12" y1="8" x2="12" y2="12"></line>
-                <line x1="12" y1="16" x2="12.01" y2="16"></line>
-            </svg>
-        );
-
-        const Download = () => (
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-                <polyline points="7 10 12 15 17 10"></polyline>
-                <line x1="12" y1="15" x2="12" y2="3"></line>
-            </svg>
-        );
-
-        const FileSpreadsheet = () => (
-            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-                <polyline points="14 2 14 8 20 8"></polyline>
-                <line x1="16" y1="13" x2="8" y2="13"></line>
-                <line x1="16" y1="17" x2="8" y2="17"></line>
-                <polyline points="10 9 9 9 8 9"></polyline>
-            </svg>
-        );
-
-        const Mic = () => (
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path>
-                <path d="M19 10v2a7 7 0 0 1-14 0v-2"></path>
-                <line x1="12" y1="19" x2="12" y2="23"></line>
-                <line x1="8" y1="23" x2="16" y2="23"></line>
-            </svg>
-        );
-
-        const MicOff = () => (
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <line x1="1" y1="1" x2="23" y2="23"></line>
-                <path d="M9 9v3a3 3 0 0 0 5.12 2.12M15 9.34V4a3 3 0 0 0-5.94-.6"></path>
-                <path d="M17 16.95A7 7 0 0 1 5 12v-2m14 0v2a7 7 0 0 1-.11 1.23"></path>
-                <line x1="12" y1="19" x2="12" y2="23"></line>
-                <line x1="8" y1="23" x2="16" y2="23"></line>
-            </svg>
-        );
-
-        const Volume2 = () => (
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
-                <path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path>
-            </svg>
-        );
-
-        const Mail = () => (
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
-                <polyline points="22,6 12,13 2,6"></polyline>
-            </svg>
-        );
+        // --- Icons ---
+        const AlertCircle = () => (<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>);
+        const Download = () => (<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>);
+        const FileSpreadsheet = () => (<svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>);
+        const Mic = () => (<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path><line x1="12" y1="19" x2="12" y2="23"></line><line x1="8" y1="23" x2="16" y2="23"></line></svg>);
+        const MicOff = () => (<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><line x1="1" y1="1" x2="23" y2="23"></line><path d="M9 9v3a3 3 0 0 0 5.12 2.12M15 9.34V4a3 3 0 0 0-5.94-.6"></path><path d="M17 16.95A7 7 0 0 1 5 12v-2m14 0v2a7 7 0 0 1-.11 1.23"></path><line x1="12" y1="19" x2="12" y2="23"></line><line x1="8" y1="23" x2="16" y2="23"></line></svg>);
+        const Volume2 = () => (<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path></svg>);
 
         const DocCheckParser = () => {
             const [input, setInput] = useState('');
+            const [status, setStatus] = useState('Full'); // Default status
             const [entries, setEntries] = useState([]);
             const [allEntries, setAllEntries] = useState([]);
             const [error, setError] = useState('');
@@ -84,391 +52,199 @@
             const [transcript, setTranscript] = useState('');
             const [browserSupport, setBrowserSupport] = useState(true);
             const [loadType, setLoadType] = useState('ALL');
-            const [emailAddress, setEmailAddress] = useState('');
-            const [showEmailModal, setShowEmailModal] = useState(false);
             const recognitionRef = useRef(null);
 
-            const LTL_SCAC_CODES = ['EXLA', 'ABFS', 'AACT', 'ODFL', 'GLBL', 'SEFL', 'FXFE'];
-            const TL_SCAC_CODES = ['AMAZON', 'MS', 'AZNG'];
-            const ALL_SCAC_CODES = [...LTL_SCAC_CODES, ...TL_SCAC_CODES];
+            const ALL_SCAC_CODES = ['EXLA', 'ABFS', 'AACT', 'ODFL', 'GLBL', 'SEFL', 'FXFE', 'AMAZON', 'MS', 'AZNG'];
 
             useEffect(() => {
                 if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
                     setBrowserSupport(false);
                     return;
                 }
-
                 const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
                 const recognition = new SpeechRecognition();
-                
                 recognition.continuous = true;
                 recognition.interimResults = true;
                 recognition.lang = 'en-US';
 
                 recognition.onresult = (event) => {
-                    let interimTranscript = '';
-                    let finalTranscript = '';
-
+                    let interim = '';
+                    let final = '';
                     for (let i = event.resultIndex; i < event.results.length; i++) {
-                        const transcriptText = event.results[i][0].transcript;
+                        const text = event.results[i][0].transcript;
                         if (event.results[i].isFinal) {
-                            finalTranscript += transcriptText + ' ';
+                            final += text + ' ';
                         } else {
-                            interimTranscript += transcriptText;
+                            interim += text;
                         }
                     }
-
-                    if (finalTranscript) {
-                        setInput(prev => prev + finalTranscript + '\n');
+                    if (final) {
+                        // FIX: Append to input, don't overwrite
+                        setInput(prev => prev + final.trim() + '\n');
                         setTranscript('');
                     } else {
-                        setTranscript(interimTranscript);
+                        setTranscript(interim);
                     }
                 };
 
-                recognition.onerror = (event) => {
-                    console.error('Speech recognition error:', event.error);
-                    if (event.error === 'no-speech') {
-                        setError('No speech detected. Please try again.');
-                    } else if (event.error === 'not-allowed') {
-                        setError('Microphone access denied. Please allow microphone access.');
-                    }
-                    setIsListening(false);
-                };
-
-                recognition.onend = () => {
-                    if (isListening) {
-                        recognition.start();
-                    }
-                };
-
+                recognition.onend = () => { if (isListening) recognition.start(); };
                 recognitionRef.current = recognition;
-
-                return () => {
-                    if (recognitionRef.current) {
-                        recognitionRef.current.stop();
-                    }
-                };
             }, [isListening]);
 
-            const parseMessage = (text) => {
+            const parseMessage = (text, currentStatus) => {
                 const lines = text.trim().split('\n');
-                const parsed = [];
+                return lines.map(line => {
+                    const upper = line.toUpperCase();
+                    let door = upper.match(/DD\d{2,3}/) || upper.match(/DOOR\s*(\d{2,3})/);
+                    let trailer = upper.match(/\b([A-Z]{2,4}\d{4,7}|\d{4,8})\b/);
+                    let scac = ALL_SCAC_CODES.find(code => upper.includes(code));
+                    
+                    const doorVal = door ? (door[1] ? `DD${door[1].padStart(3,'0')}` : door[0]) : '';
+                    
+                    // Logic for Load Type based on door range
+                    let type = '';
+                    if (doorVal) {
+                        const num = parseInt(doorVal.replace(/\D/g,''));
+                        type = (num >= 52 && num <= 72) ? 'LTL' : (num >= 86 && num <= 109) ? 'TL' : '';
+                    }
+
+                    return {
+                        door: doorVal,
+                        trailer: trailer ? trailer[0] : '',
+                        carrier: scac || '',
+                        loadType: type,
+                        status: currentStatus, // New Required Column
+                        originalText: line,
+                        timestamp: new Date().toLocaleString()
+                    };
+                }).filter(e => e.door || e.trailer);
+            };
+
+            const handleParse = () => {
+                if (!input.trim()) return setError('Please enter data first');
+                const newParsed = parseMessage(input, status);
                 
-                for (const line of lines) {
-                    if (!line.trim()) continue;
-                    
-                    const upperLine = line.toUpperCase();
-                    
-                    let doorMatch = upperLine.match(/DD(0(5[2-9]|6[0-9]|7[0-2])|0(8[6-9]|9[0-9])|10[0-9])/);
-                    if (!doorMatch) {
-                        const spokenDoor = upperLine.match(/(?:D\s*D|DOOR)\s*(0?(5[2-9]|6[0-9]|7[0-2]|8[6-9]|9[0-9])|10[0-9])/);
-                        if (spokenDoor) {
-                            const num = spokenDoor[1].padStart(3, '0');
-                            doorMatch = [`DD${num}`];
-                        }
-                    }
-                    
-                    let detectedLoadType = '';
-                    if (doorMatch) {
-                        const doorNum = parseInt(doorMatch[0].substring(2));
-                        if (doorNum >= 52 && doorNum <= 72) {
-                            detectedLoadType = 'LTL';
-                        } else if (doorNum >= 86 && doorNum <= 109) {
-                            detectedLoadType = 'TL';
-                        }
-                    }
-                    
-                    let trailerMatch = upperLine.match(/\b([A-Z]{3,4}\s*\d{4,6}|\d{4,6})\b/);
-                    if (!trailerMatch) {
-                        const trailerKeyword = upperLine.match(/TRAILER\s*(?:NUMBER\s*)?([A-Z0-9\s]{4,10})/);
-                        if (trailerKeyword) {
-                            trailerMatch = [trailerKeyword[1].replace(/\s+/g, '')];
-                        }
-                    }
-                    
-                    let scacCode = null;
-                    for (const scac of ALL_SCAC_CODES) {
-                        if (upperLine.includes(scac)) {
-                            scacCode = scac;
-                            break;
-                        }
-                    }
-                    
-                    if (!scacCode) {
-                        const spokenCarriers = {
-                            'EXCEL': 'EXLA', 'EXCELA': 'EXLA', 'ESTES': 'EXLA', 'ESTEST': 'EXLA',
-                            'ABF': 'ABFS', 'AAA COOPER': 'AACT', 'AAA': 'AACT', 'TRIPLE A': 'AACT',
-                            'COOPER': 'AACT', 'OLD DOMINION': 'ODFL', 'GLOBAL': 'GLBL',
-                            'PERIMETER': 'GLBL', 'SOUTHEASTERN': 'SEFL', 'SOUTH EASTERN': 'SEFL',
-                            'FEDEX': 'FXFE', 'FED EX': 'FXFE', 'MID SOUTH': 'MS',
-                            'MIDSOUTH': 'MS', 'MID-SOUTH': 'MS'
-                        };
-                        
-                        for (const [spoken, code] of Object.entries(spokenCarriers)) {
-                            if (upperLine.includes(spoken)) {
-                                scacCode = code;
-                                break;
-                            }
-                        }
-                    }
-                    
-                    if (doorMatch || trailerMatch || scacCode) {
-                        parsed.push({
-                            door: doorMatch ? doorMatch[0] : '',
-                            trailer: trailerMatch ? trailerMatch[0].replace(/\s+/g, '') : '',
-                            carrier: scacCode || '',
-                            loadType: detectedLoadType,
-                            originalText: line
-                        });
-                    }
-                }
+                // LOGGING TO GOOGLE ANALYTICS
+                newParsed.forEach(entry => {
+                    gtag('event', 'entry_added', {
+                        'door': entry.door,
+                        'trailer': entry.trailer,
+                        'status': entry.status
+                    });
+                });
+
+                setAllEntries(prev => [...prev, ...newParsed]);
+                setEntries(newParsed);
+                setInput('');
+                setError('');
+            };
+
+            const exportReport = () => {
+                if (allEntries.length === 0) return setError('No data to export');
                 
-                return parsed;
+                const data = allEntries.map(e => ({
+                    'Date/Time': e.timestamp,
+                    'Door': e.door,
+                    'Carrier': e.carrier,
+                    'Trailer': e.trailer,
+                    'Load Type': e.loadType,
+                    'Trailer Status': e.status
+                }));
+
+                const ws = XLSX.utils.json_to_sheet(data);
+                const wb = XLSX.utils.book_new();
+                XLSX.utils.book_append_sheet(wb, ws, "Dock Checks");
+                XLSX.writeFile(wb, `DocCheck_Report_${new Date().toLocaleDateString()}.xlsx`);
+                
+                gtag('event', 'report_downloaded', { 'count': allEntries.length });
             };
 
             const toggleListening = () => {
-                if (!browserSupport) {
-                    setError('Speech recognition is not supported in this browser. Please use Chrome, Edge, or Safari.');
-                    return;
-                }
-
                 if (isListening) {
                     recognitionRef.current?.stop();
                     setIsListening(false);
-                    setTranscript('');
                 } else {
-                    setError('');
                     recognitionRef.current?.start();
                     setIsListening(true);
                 }
             };
 
-            const speakInstructions = () => {
-                const utterance = new SpeechSynthesisUtterance(
-                    "Say your door number, trailer number, and carrier. For example: Door 52, trailer A B C 1 2 3 4, Estes."
-                );
-                speechSynthesis.speak(utterance);
-            };
-
-            const handleParse = () => {
-                setError('');
-                if (!input.trim()) {
-                    setError('Please enter some text to parse or use voice input');
-                    return;
-                }
-
-                let parsed = parseMessage(input);
-                setAllEntries(prev => [...prev, ...parsed]);
-                
-                if (loadType !== 'ALL') {
-                    parsed = parsed.filter(entry => entry.loadType === loadType);
-                }
-                
-                if (parsed.length === 0) {
-                    setError('No valid data found. Make sure to include door numbers, trailer numbers, and carriers.');
-                    return;
-                }
-
-                setEntries(parsed);
-                setInput('');
-            };
-
-            const exportAndEmailReport = () => {
-                if (allEntries.length === 0) {
-                    setError('No data to export. Please parse some entries first.');
-                    return;
-                }
-
-                const sortedEntries = [...allEntries].sort((a, b) => {
-                    const doorA = a.door ? parseInt(a.door.replace('DD', '')) : 999;
-                    const doorB = b.door ? parseInt(b.door.replace('DD', '')) : 999;
-                    return doorA - doorB;
-                });
-
-                const data = sortedEntries.map(entry => ({
-                    'Door': entry.door,
-                    'Carrier (SCAC)': entry.carrier,
-                    'Trailer Number': entry.trailer,
-                    'Load Type': entry.loadType
-                }));
-
-                const ws = XLSX.utils.json_to_sheet(data);
-                const wb = XLSX.utils.book_new();
-                XLSX.utils.book_append_sheet(wb, ws, 'Doc Checks');
-
-                ws['!cols'] = [{ wch: 10 }, { wch: 15 }, { wch: 15 }, { wch: 12 }];
-
-                const timestamp = new Date().toISOString().slice(0, 10);
-                XLSX.writeFile(wb, `doc_checks_${timestamp}.xlsx`);
-
-                const csv = XLSX.utils.sheet_to_csv(ws);
-                const subject = encodeURIComponent(`Doc Check Report - ${timestamp}`);
-                const body = encodeURIComponent(
-                    `Doc Check Report for ${timestamp}\n\n` +
-                    `Total Entries: ${allEntries.length}\n` +
-                    `LTL Entries: ${allEntries.filter(e => e.loadType === 'LTL').length}\n` +
-                    `TL Entries: ${allEntries.filter(e => e.loadType === 'TL').length}\n\n` +
-                    `Data:\n${csv}`
-                );
-                
-                // ... (inside exportAndAndEmailReport)
-                // This is where the XLSX file is downloaded successfully:
-                XLSX.writeFile(wb, `doc_checks_${timestamp}.xlsx`);
-
-                // Give the user a clear success message/prompt
-                alert(`Success! The report file (doc_checks_${timestamp}.xlsx) has been downloaded. Please open your mail client, start a new email to ${emailAddress}, and attach the downloaded file.`);
-
-                // Close the modal
-                setShowEmailModal(false);
-            };
-
-            const openEmailModal = () => {
-                if (allEntries.length === 0) {
-                    setError('Please parse some data first');
-                    return;
-                }
-                setShowEmailModal(true);
-            };
-
-            const handleClear = () => {
-                setInput('');
-                setEntries([]);
-                setAllEntries([]);
-                setError('');
-                setTranscript('');
-            };
-
             return (
-                <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 p-6">
-                    <div className="max-w-6xl mx-auto">
-                        <div className="bg-white rounded-lg shadow-xl p-8">
-                            <div className="flex items-center justify-between mb-6">
-                                <div className="flex items-center gap-3">
-                                    <FileSpreadsheet />
-                                    <div>
-                                        <h1 className="text-3xl font-bold text-gray-800">Doc Check Parser</h1>
-                                        <p className="text-sm text-gray-600 mt-1">LTL & TL Load Types</p>
-                                    </div>
-                                </div>
-                                <button onClick={speakInstructions} className="px-4 py-2 bg-blue-100 text-blue-700 rounded-lg hover:bg-blue-200 transition-colors flex items-center gap-2">
-                                    <Volume2 />
-                                    Instructions
-                                </button>
+                <div className="min-h-screen bg-gray-50 p-6">
+                    <div className="max-w-5xl mx-auto bg-white rounded-xl shadow-lg p-8">
+                        <div className="flex justify-between items-center mb-8 border-b pb-4">
+                            <div className="flex items-center gap-3">
+                                <FileSpreadsheet />
+                                <h1 className="text-2xl font-bold text-gray-800">Dock Check Pro</h1>
                             </div>
-
-                            {!browserSupport && (
-                                <div className="mb-4 p-4 bg-yellow-50 border border-yellow-200 rounded-lg flex items-center gap-2 text-yellow-800">
-                                    <AlertCircle />
-                                    <span>Voice recognition not supported. Please use Chrome, Edge, or Safari.</span>
-                                </div>
-                            )}
-
-                            <div className="mb-6">
-                                <label className="block text-sm font-semibold text-gray-700 mb-2">Filter by Load Type</label>
-                                <div className="flex gap-3">
-                                    <button onClick={() => setLoadType('ALL')} className={`px-4 py-2 rounded-lg font-semibold transition-colors ${loadType === 'ALL' ? 'bg-indigo-600 text-white' : 'bg-gray-200 text-gray-700 hover:bg-gray-300'}`}>All Loads</button>
-                                    <button onClick={() => setLoadType('LTL')} className={`px-4 py-2 rounded-lg font-semibold transition-colors ${loadType === 'LTL' ? 'bg-indigo-600 text-white' : 'bg-gray-200 text-gray-700 hover:bg-gray-300'}`}>LTL Only</button>
-                                    <button onClick={() => setLoadType('TL')} className={`px-4 py-2 rounded-lg font-semibold transition-colors ${loadType === 'TL' ? 'bg-indigo-600 text-white' : 'bg-gray-200 text-gray-700 hover:bg-gray-300'}`}>TL Only</button>
-                                </div>
-                            </div>
-
-                            <div className="mb-6">
-                                <div className="flex items-center justify-between mb-2">
-                                    <label className="block text-sm font-semibold text-gray-700">Enter Loader Messages</label>
-                                    <button onClick={toggleListening} className={`px-6 py-3 rounded-lg transition-all font-semibold flex items-center gap-2 ${isListening ? 'bg-red-500 hover:bg-red-600 text-white animate-pulse' : 'bg-indigo-600 hover:bg-indigo-700 text-white'}`}>
-                                        {isListening ? <><MicOff /> Stop Listening</> : <><Mic /> Start Voice</>}
-                                    </button>
-                                </div>
-                                
-                                {isListening && transcript && (
-                                    <div className="mb-2 p-3 bg-blue-50 border border-blue-200 rounded-lg">
-                                        <span className="text-sm font-semibold text-blue-700">Listening: </span>
-                                        <span className="text-blue-600 italic">{transcript}</span>
-                                    </div>
-                                )}
-                                
-                                <textarea value={input} onChange={(e) => setInput(e.target.value)} className="w-full h-48 p-4 border-2 border-gray-300 rounded-lg focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 transition-all" placeholder="Type or speak: 'Door 52 trailer ABC1234 Estes'" />
-                            </div>
-
-                            {error && (
-                                <div className="mb-4 p-4 bg-red-50 border border-red-200 rounded-lg flex items-center gap-2 text-red-700">
-                                    <AlertCircle />
-                                    <span>{error}</span>
-                                </div>
-                            )}
-
-                            <div className="flex gap-3 mb-6">
-                                <button onClick={handleParse} className="px-6 py-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors font-semibold">Parse Messages</button>
-                                <button onClick={handleClear} className="px-6 py-3 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors font-semibold">Clear All</button>
-                            </div>
-
-                            {entries.length > 0 && (
-                                <div>
-                                    <div className="mb-4 p-4 bg-green-50 border border-green-200 rounded-lg">
-                                        <p className="text-green-800">
-                                            <strong>Current View:</strong> {entries.length} | <strong>Total Accumulated:</strong> {allEntries.length} (will be exported)
-                                        </p>
-                                    </div>
-
-                                    <div className="flex justify-between items-center mb-4">
-                                        <h2 className="text-xl font-bold text-gray-800">Current Entries ({entries.length})</h2>
-                                        <button onClick={openEmailModal} className="px-6 py-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors font-semibold flex items-center gap-2">
-                                            <Mail />
-                                            <Download />
-                                            Export & Email ({allEntries.length})
-                                        </button>
-                                    </div>
-
-                                    <div className="overflow-x-auto">
-                                        <table className="w-full border-collapse">
-                                            <thead>
-                                                <tr className="bg-indigo-600 text-white">
-                                                    <th className="p-3 text-left border border-indigo-500">Type</th>
-                                                    <th className="p-3 text-left border border-indigo-500">Door</th>
-                                                    <th className="p-3 text-left border border-indigo-500">Trailer</th>
-                                                    <th className="p-3 text-left border border-indigo-500">Carrier</th>
-                                                    <th className="p-3 text-left border border-indigo-500">Original</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                {entries.map((entry, idx) => (
-                                                    <tr key={idx} className="hover:bg-gray-50">
-                                                        <td className="p-3 border border-gray-300">
-                                                            {entry.loadType ? (
-                                                                <span className={`px-2 py-1 rounded-full text-xs font-semibold ${entry.loadType === 'LTL' ? 'bg-blue-100 text-blue-700' : 'bg-purple-100 text-purple-700'}`}>
-                                                                    {entry.loadType}
-                                                                </span>
-                                                            ) : '-'}
-                                                        </td>
-                                                        <td className="p-3 border border-gray-300 font-mono">{entry.door || '-'}</td>
-                                                        <td className="p-3 border border-gray-300 font-mono">{entry.trailer || '-'}</td>
-                                                        <td className="p-3 border border-gray-300">
-                                                            {entry.carrier ? (
-                                                                <span className="px-3 py-1 bg-indigo-100 text-indigo-700 rounded-full text-sm font-semibold">{entry.carrier}</span>
-                                                            ) : '-'}
-                                                        </td>
-                                                        <td className="p-3 border border-gray-300 text-sm text-gray-600">{entry.originalText}</td>
-                                                    </tr>
-                                                ))}
-                                            </tbody>
-                                        </table>
-                                    </div>
-                                </div>
-                            )}
+                            <button onClick={exportReport} className="bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded-lg font-bold flex items-center gap-2">
+                                <Download /> Export Report ({allEntries.length})
+                            </button>
                         </div>
 
-                        {showEmailModal && (
-                            <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-                                <div className="bg-white rounded-lg shadow-2xl p-8 max-w-md w-full">
-                                    <h2 className="text-2xl font-bold text-gray-800 mb-4">Export & Email Report</h2>
-                                    <p className="text-gray-600 mb-4">Ready to export <strong>{allEntries.length} entries</strong></p>
-                                    <input type="email" value={emailAddress} onChange={(e) => setEmailAddress(e.target.value)} placeholder="your.email@gmail.com" className="w-full p-3 border-2 border-gray-300 rounded-lg focus:border-indigo-500 mb-4" />
-                                    <div className="flex gap-3">
-                                        <button onClick={exportAndEmailReport} disabled={!emailAddress} className="flex-1 px-6 py-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 font-semibold disabled:bg-gray-300">Export & Send</button>
-                                        <button onClick={() => setShowEmailModal(false)} className="flex-1 px-6 py-3 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 font-semibold">Cancel</button>
-                                    </div>
-                                </div>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                            <div>
+                                <label className="block text-sm font-bold text-gray-700 mb-2">1. Select Trailer Status</label>
+                                <select 
+                                    value={status} 
+                                    onChange={(e) => setStatus(e.target.value)}
+                                    className="w-full p-3 border-2 border-indigo-200 rounded-lg focus:border-indigo-500 bg-white"
+                                >
+                                    <option value="Full">Full (Loaded)</option>
+                                    <option value="Empty">Empty (Available)</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label className="block text-sm font-bold text-gray-700 mb-2">2. Voice Input</label>
+                                <button onClick={toggleListening} className={`w-full py-3 rounded-lg font-bold flex items-center justify-center gap-2 transition-all ${isListening ? 'bg-red-500 text-white animate-pulse' : 'bg-indigo-600 text-white'}`}>
+                                    {isListening ? <><MicOff /> Stop Recording</> : <><Mic /> Start Voice Input</>}
+                                </button>
+                            </div>
+                        </div>
+
+                        <div className="mb-6">
+                            {isListening && transcript && (
+                                <div className="text-indigo-600 italic text-sm mb-1">Live: {transcript}</div>
+                            )}
+                            <textarea 
+                                value={input} 
+                                onChange={(e) => setInput(e.target.value)}
+                                className="w-full h-32 p-4 border-2 border-gray-200 rounded-lg"
+                                placeholder="Logs will appear here or type manually..."
+                            />
+                        </div>
+
+                        <div className="flex gap-4 mb-8">
+                            <button onClick={handleParse} className="bg-indigo-700 text-white px-8 py-3 rounded-lg font-bold">Add to Log</button>
+                            <button onClick={() => setAllEntries([])} className="text-gray-500 hover:text-red-500 font-semibold">Reset History</button>
+                        </div>
+
+                        {allEntries.length > 0 && (
+                            <div className="overflow-hidden border rounded-lg">
+                                <table className="w-full text-left">
+                                    <thead className="bg-gray-100">
+                                        <tr>
+                                            <th className="p-3 text-xs font-bold uppercase">Door</th>
+                                            <th className="p-3 text-xs font-bold uppercase">Trailer</th>
+                                            <th className="p-3 text-xs font-bold uppercase">Status</th>
+                                            <th className="p-3 text-xs font-bold uppercase">Type</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody className="divide-y">
+                                        {allEntries.slice().reverse().map((e, i) => (
+                                            <tr key={i} className="hover:bg-gray-50">
+                                                <td className="p-3 font-mono">{e.door || '??'}</td>
+                                                <td className="p-3">{e.trailer || '??'}</td>
+                                                <td className="p-3">
+                                                    <span className={`px-2 py-1 rounded text-xs font-bold ${e.status === 'Full' ? 'bg-orange-100 text-orange-700' : 'bg-green-100 text-green-700'}`}>
+                                                        {e.status}
+                                                    </span>
+                                                </td>
+                                                <td className="p-3 text-xs text-gray-500">{e.loadType}</td>
+                                            </tr>
+                                        ))}
+                                    </tbody>
+                                </table>
                             </div>
                         )}
                     </div>
@@ -479,4 +255,7 @@
         ReactDOM.render(<DocCheckParser />, document.getElementById('root'));
     </script>
 </body>
+</html>
+</body>
+
 </html>
